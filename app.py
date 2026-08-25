@@ -8,7 +8,6 @@ import feedparser
 import requests
 
 app = Flask(__name__)
-
 CONFIG_PATH = os.getenv("CONFIG_PATH", "/app/feeds.json")
 TIMEOUT = int(os.getenv("FETCH_TIMEOUT_SECONDS", "20"))
 USER_AGENT = os.getenv("USER_AGENT", "rsscombine-news/1.0")
@@ -17,7 +16,6 @@ USER_AGENT = os.getenv("USER_AGENT", "rsscombine-news/1.0")
 def load_sources():
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         sources = json.load(f)
-
     economist = os.getenv("ECONOMIST_RSS_URL", "").strip()
     if economist:
         sources.append({"name": "The Economist", "url": economist})
@@ -30,45 +28,39 @@ def fetch_latest(source):
     parsed = feedparser.parse(r.content)
     if not parsed.entries:
         raise RuntimeError("feed has no entries")
-
     entry = parsed.entries[0]
     enclosures = entry.get("enclosures", [])
     if not enclosures:
         raise RuntimeError("latest entry has no audio enclosure")
-
     enclosure = enclosures[0]
     audio_url = enclosure.get("href") or enclosure.get("url")
     if not audio_url:
         raise RuntimeError("audio enclosure has no URL")
-
-    guid = entry.get("id") or entry.get("guid") or entry.get("link") or audio_url
-    title = entry.get("title") or source["name"]
-    description = entry.get("summary") or entry.get("description") or ""
-    link = entry.get("link") or source["url"]
-    mime = enclosure.get("type") or "audio/mpeg"
-    length = enclosure.get("length") or "0"
-
     actual_date = None
     for key in ("published_parsed", "updated_parsed"):
         value = entry.get(key)
         if value:
             actual_date = datetime(*value[:6], tzinfo=timezone.utc)
             break
-
     return {
-        "source": source["name"], "title": title, "description": description,
-        "link": link, "guid": str(guid), "audio_url": audio_url,
-        "mime": mime, "length": str(length), "actual_date": actual_date,
+        "source": source["name"],
+        "title": entry.get("title") or source["name"],
+        "description": entry.get("summary") or entry.get("description") or "",
+        "link": entry.get("link") or source["url"],
+        "guid": str(entry.get("id") or entry.get("guid") or entry.get("link") or audio_url),
+        "audio_url": audio_url,
+        "mime": enclosure.get("type") or "audio/mpeg",
+        "length": str(enclosure.get("length") or "0"),
+        "actual_date": actual_date,
     }
 
 
 def cdata(text):
-    return "<![CDATA[" + str(text).replace("]]>", "]]]]><![CDATA[>") + "]]>")
+    return "<![CDATA[" + str(text).replace("]]>", "]]]]><![CDATA[>") + "]] >".replace(" ", "")
 
 
 def build_feed():
-    items = []
-    errors = []
+    items, errors = [], []
     for source in load_sources():
         try:
             items.append(fetch_latest(source))
