@@ -25,11 +25,7 @@ def load_sources():
 
 
 def fetch_latest(source):
-    r = requests.get(
-        source["url"],
-        timeout=TIMEOUT,
-        headers={"User-Agent": USER_AGENT},
-    )
+    r = requests.get(source["url"], timeout=TIMEOUT, headers={"User-Agent": USER_AGENT})
     r.raise_for_status()
     parsed = feedparser.parse(r.content)
     if not parsed.entries:
@@ -60,15 +56,9 @@ def fetch_latest(source):
             break
 
     return {
-        "source": source["name"],
-        "title": title,
-        "description": description,
-        "link": link,
-        "guid": str(guid),
-        "audio_url": audio_url,
-        "mime": mime,
-        "length": str(length),
-        "actual_date": actual_date,
+        "source": source["name"], "title": title, "description": description,
+        "link": link, "guid": str(guid), "audio_url": audio_url,
+        "mime": mime, "length": str(length), "actual_date": actual_date,
     }
 
 
@@ -77,28 +67,19 @@ def cdata(text):
 
 
 def build_feed():
-    sources = load_sources()
     items = []
     errors = []
-
-    for source in sources:
+    for source in load_sources():
         try:
             items.append(fetch_latest(source))
         except Exception as exc:
             errors.append(f"{source['name']}: {exc}")
 
-    # Podcast apps often sort by pubDate. Assign synthetic dates a few seconds apart
-    # so the configured source order is preserved, while keeping the real source
-    # publication time in each item's description.
     now = datetime.now(timezone.utc)
     xml_items = []
     for idx, item in enumerate(items):
         synthetic_date = now - timedelta(seconds=idx)
-        actual = (
-            item["actual_date"].astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-            if item["actual_date"]
-            else "unknown"
-        )
+        actual = item["actual_date"].strftime("%Y-%m-%d %H:%M UTC") if item["actual_date"] else "unknown"
         description = f"Source: {item['source']} | Original publication: {actual}<br/><br/>{item['description']}"
         xml_items.append(f"""
     <item>
@@ -110,10 +91,7 @@ def build_feed():
       <enclosure url=\"{html.escape(item['audio_url'], quote=True)}\" length=\"{html.escape(item['length'], quote=True)}\" type=\"{html.escape(item['mime'], quote=True)}\" />
     </item>""")
 
-    warning = ""
-    if errors:
-        warning = "<!-- " + " | ".join(errors).replace("--", "—") + " -->"
-
+    warning = "<!-- " + " | ".join(errors).replace("--", "—") + " -->" if errors else ""
     return f"""<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <rss version=\"2.0\" xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\">
   <channel>
@@ -142,11 +120,7 @@ def health():
 
 @app.get("/")
 def index():
-    return (
-        "rsscombine-news is running. Subscribe your podcast app to /feed.xml",
-        200,
-        {"Content-Type": "text/plain; charset=utf-8"},
-    )
+    return "rsscombine-news is running. Subscribe your podcast app to /feed.xml", 200, {"Content-Type": "text/plain; charset=utf-8"}
 
 
 if __name__ == "__main__":
