@@ -1,0 +1,10 @@
+services:
+  rsscombine-news:
+    image: ghcr.io/aaronh86/rsscombine-news:latest
+    container_name: rsscombine-news
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    # Uncomment after obtaining your private Economist Podcasts+ RSS URL.
+    # environment:
+    #   ECONOMIST_RSS_URL: "https://your-private-economist-feed"
