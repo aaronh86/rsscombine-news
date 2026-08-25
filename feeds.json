@@ -1,0 +1,22 @@
+[
+  {
+    "name": "ABC News Australia",
+    "url": "https://www.abc.net.au/feeds/101858056/podcast.xml"
+  },
+  {
+    "name": "Sky News Australia",
+    "url": "https://www.omnycontent.com/d/playlist/2fb3740d-3436-44af-8cc0-a91900716aa5/cfb18248-9dff-4d09-bd49-ac2a005249de/fe2a1ad4-69d9-4072-8355-ac2a005249de/podcast.rss"
+  },
+  {
+    "name": "Al Jazeera",
+    "url": "https://www.omnycontent.com/d/playlist/9c074afa-3313-47e8-b802-a9f900789975/63048eda-2427-408a-b47c-ad5001293fca/6677d422-fd43-4aaa-be74-ad5001293fd8/podcast.rss"
+  },
+  {
+    "name": "BBC World Service",
+    "url": "https://podcast.voice.api.bbci.co.uk/rss/audio/p002vsmz"
+  },
+  {
+    "name": "CNN 5 Things",
+    "url": "https://feeds.megaphone.fm/WMHY2007701094"
+  }
+]
