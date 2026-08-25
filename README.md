@@ -76,6 +76,9 @@ ghcr.io/aaronh86/rsscombine-news:latest
 
 The repository/package may be private by default. If TrueNAS is to pull without GHCR credentials, change the package visibility to public in GitHub package settings.
 
-## Credits
+## Acknowledgements
 
-Inspired by the feed-combining approach of `chase-seibert/rsscombine`. This implementation is purpose-built for podcast feeds because the original project does not preserve podcast audio enclosure metadata in its generated Atom output.
+Inspired by **RSS Combine**, created by **Chase Seibert**:
+https://github.com/chase-seibert/rsscombine
+
+RSS Combine provided the inspiration for the feed-combining approach used by this project. This implementation is independently written and purpose-built for podcast feeds, including preservation of the publishers' original podcast audio enclosure URLs.
